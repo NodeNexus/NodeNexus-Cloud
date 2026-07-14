@@ -1,127 +1,117 @@
-import { useStore } from "@/store/useStore"
+import { Link, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   LayoutDashboard, 
   Box, 
-  ShoppingCart, 
+  Store, 
+  HardDrive, 
   Activity, 
-  Settings,
-  LogOut
+  Network, 
+  Container, 
+  Settings, 
+  Bot, 
+  LogOut,
+  ChevronLeft
 } from "lucide-react"
-import { NavLink } from "react-router-dom"
-import { cn } from "@/lib/utils"
+import { useStore } from "@/store/useStore"
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-  { icon: Box, label: "Containers", href: "/containers" },
-  { icon: ShoppingCart, label: "Marketplace", href: "/marketplace" },
-  { icon: Activity, label: "Monitoring", href: "/monitoring" },
+const navigation = [
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Containers', href: '/containers', icon: Box },
+  { name: 'Marketplace', href: '/marketplace', icon: Store },
+  { name: 'Storage', href: '/storage', icon: HardDrive },
+  { name: 'Monitoring', href: '/monitoring', icon: Activity },
+  { name: 'Networks', href: '/networks', icon: Network },
+  { name: 'Docker', href: '/docker', icon: Container },
+  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'AI Assistant', href: '/ai', icon: Bot },
 ]
 
 export const Sidebar = () => {
-  const { isSidebarOpen } = useStore()
+  const { isSidebarOpen, toggleSidebar } = useStore()
+  const location = useLocation()
 
   return (
-    <motion.aside
+    <motion.div 
       initial={false}
-      animate={{ 
-        width: isSidebarOpen ? 240 : 80,
-        opacity: 1
-      }}
-      className="fixed left-0 top-0 z-40 h-screen border-r border-white/5 bg-black/50 backdrop-blur-2xl flex flex-col"
+      animate={{ width: isSidebarOpen ? 240 : 80 }}
+      className="h-screen bg-zinc-950/50 backdrop-blur-xl border-r border-white/5 flex flex-col flex-shrink-0 sticky top-0 relative z-50"
     >
-      <div className="flex h-16 items-center justify-center border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-            <span className="font-bold text-white text-lg">V</span>
-          </div>
-          <AnimatePresence>
-            {isSidebarOpen && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                className="font-semibold tracking-wide text-zinc-100 whitespace-nowrap overflow-hidden"
-              >
-                VNAV Cloud
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
+      <div className="h-16 flex items-center justify-between px-4 border-b border-white/5">
+        <AnimatePresence mode="popLayout">
+          {isSidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="font-bold text-xl tracking-tighter text-white flex items-center gap-2"
+            >
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                <Box className="w-5 h-5 text-white" />
+              </div>
+              VNAV Cloud
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <button 
+          onClick={toggleSidebar}
+          className="p-2 rounded-xl hover:bg-white/5 text-zinc-400 transition-colors"
+        >
+          <motion.div animate={{ rotate: isSidebarOpen ? 0 : 180 }}>
+            <ChevronLeft className="w-5 h-5" />
+          </motion.div>
+        </button>
       </div>
 
-      <nav className="flex-1 space-y-2 p-4">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.href}
-            to={item.href}
-            className={({ isActive }) => cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors relative overflow-hidden group",
-              isActive ? "text-white bg-white/10" : "text-zinc-400 hover:text-white hover:bg-white/5"
-            )}
-          >
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-50"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
+      <nav className="flex-1 overflow-y-auto p-4 space-y-1 scrollbar-hide">
+        {navigation.map((item) => {
+          const isActive = location.pathname === item.href
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                isActive 
+                  ? 'bg-white/10 text-white' 
+                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 rounded-xl bg-white/10 border border-white/10"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <item.icon className="w-5 h-5 flex-shrink-0 relative z-10" />
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="truncate font-medium relative z-10"
+                  >
+                    {item.name}
+                  </motion.span>
                 )}
-                <item.icon className="h-5 w-5 relative z-10" />
-                <AnimatePresence>
-                  {isSidebarOpen && (
-                    <motion.span
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: "auto" }}
-                      exit={{ opacity: 0, width: 0 }}
-                      className="text-sm font-medium whitespace-nowrap relative z-10 overflow-hidden"
-                    >
-                      {item.label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </>
-            )}
-          </NavLink>
-        ))}
+              </AnimatePresence>
+            </Link>
+          )
+        })}
       </nav>
 
-      <div className="p-4 border-t border-white/5 space-y-2">
-        <NavLink
-          to="/settings"
-          className={({ isActive }) => cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
-            isActive ? "text-white bg-white/10" : "text-zinc-400 hover:text-white hover:bg-white/5"
-          )}
-        >
-          <Settings className="h-5 w-5" />
+      <div className="p-4 border-t border-white/5">
+        <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group w-full text-zinc-400 hover:bg-rose-500/10 hover:text-rose-400">
+          <LogOut className="w-5 h-5 flex-shrink-0" />
           <AnimatePresence>
             {isSidebarOpen && (
               <motion.span
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
-                className="text-sm font-medium whitespace-nowrap overflow-hidden"
-              >
-                Settings
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </NavLink>
-        <button
-          className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-        >
-          <LogOut className="h-5 w-5" />
-          <AnimatePresence>
-            {isSidebarOpen && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                className="text-sm font-medium whitespace-nowrap overflow-hidden"
+                className="truncate font-medium"
               >
                 Logout
               </motion.span>
@@ -129,6 +119,6 @@ export const Sidebar = () => {
           </AnimatePresence>
         </button>
       </div>
-    </motion.aside>
+    </motion.div>
   )
 }
