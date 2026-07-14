@@ -2,7 +2,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
-import { Play, Square, RefreshCw, Trash2, FileText, Terminal, Activity, ChevronRight, Search, Filter } from "lucide-react"
+import { Play, Square, RefreshCw, Trash2, FileText, Terminal, Search } from "lucide-react"
 import { ContainerInfo, dockerApi } from "@/api/docker"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 

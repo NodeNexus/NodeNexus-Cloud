@@ -1,0 +1,12 @@
+{
+  "id": "traefik",
+  "name": "Traefik",
+  "description": "Official docker image for Traefik.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "Networking",
+  "docker_image": "traefik:latest",
+  "ports": {
+    "8080": "8080"
+  }
+}

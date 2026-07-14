@@ -1,0 +1,12 @@
+{
+  "id": "redis",
+  "name": "Redis",
+  "description": "Official docker image for Redis.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "Databases",
+  "docker_image": "redis:latest",
+  "ports": {
+    "6379": "6379"
+  }
+}

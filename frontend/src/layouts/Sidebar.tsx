@@ -6,7 +6,6 @@ import {
   Store, 
   HardDrive, 
   Activity, 
-  Network, 
   Container, 
   Settings, 
   Bot, 
@@ -20,7 +19,15 @@ import {
   Network,
   Layers,
   Package,
-  Radio
+  Radio,
+  AlertTriangle,
+  Bell,
+  Workflow,
+  DatabaseBackup,
+  CalendarClock,
+  RotateCcw,
+  RefreshCcw,
+  History
 } from "lucide-react"
 import { useStore } from "@/store/useStore"
 
@@ -32,8 +39,25 @@ const navigation = [
   { name: 'Files', href: '/files', icon: Folder },
   { name: 'Containers', href: '/containers', icon: Box },
   { name: 'Marketplace', href: '/marketplace', icon: Store },
-  { name: 'Monitoring', href: '/monitoring', icon: Activity },
   { name: 'Settings', href: '/settings', icon: Settings },
+]
+
+const monitoringNavigation = [
+  { name: 'Health', href: '/monitoring/health', icon: Activity },
+  { name: 'Alerts', href: '/monitoring/alerts', icon: AlertTriangle },
+  { name: 'Notifications', href: '/monitoring/notifications', icon: Bell },
+  { name: 'Integrations', href: '/monitoring/integrations', icon: Workflow },
+]
+
+const backupsNavigation = [
+  { name: 'Dashboard', href: '/backups', icon: DatabaseBackup },
+  { name: 'Schedules', href: '/backups/schedules', icon: CalendarClock },
+  { name: 'Restore Wizard', href: '/backups/restore', icon: RotateCcw },
+]
+
+const updatesNavigation = [
+  { name: 'Update Center', href: '/updates', icon: RefreshCcw },
+  { name: 'Update History', href: '/updates/history', icon: History },
 ]
 
 const clusterNavigation = [
@@ -43,6 +67,11 @@ const clusterNavigation = [
   { name: 'Deployments', href: '/deployments', icon: Layers },
   { name: 'Helm Charts', href: '/helm', icon: Package },
   { name: 'Edge Devices', href: '/edge', icon: Radio },
+]
+
+const aiNavigation = [
+  { name: 'Chat', href: '/ai', icon: Bot },
+  { name: 'Automations', href: '/automations', icon: Settings },
 ]
 
 const adminNavigation = [
@@ -154,6 +183,166 @@ export const Sidebar = () => {
                 />
               )}
               <item.icon className="w-5 h-5 flex-shrink-0 relative z-10" />
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="truncate font-medium relative z-10"
+                  >
+                    {item.name}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          )
+        })}
+
+        <div className="pt-4 pb-2 px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+          {isSidebarOpen && "Monitoring"}
+        </div>
+        {monitoringNavigation.map((item) => {
+          const isActive = location.pathname === item.href || (location.pathname.startsWith('/monitoring') && item.href === '/monitoring/health' && location.pathname === '/monitoring')
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                isActive 
+                  ? 'bg-emerald-600/20 text-emerald-400' 
+                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 rounded-xl bg-emerald-600/10 border border-emerald-500/20"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <item.icon className={`w-5 h-5 flex-shrink-0 relative z-10 ${isActive ? 'text-emerald-400' : ''}`} />
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="truncate font-medium relative z-10"
+                  >
+                    {item.name}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          )
+        })}
+
+        <div className="pt-4 pb-2 px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+          {isSidebarOpen && "Backups"}
+        </div>
+        {backupsNavigation.map((item) => {
+          const isActive = location.pathname === item.href || (location.pathname.startsWith('/backups') && item.href === '/backups' && location.pathname === '/backups')
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                isActive 
+                  ? 'bg-indigo-600/20 text-indigo-400' 
+                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 rounded-xl bg-indigo-600/10 border border-indigo-500/20"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <item.icon className={`w-5 h-5 flex-shrink-0 relative z-10 ${isActive ? 'text-indigo-400' : ''}`} />
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="truncate font-medium relative z-10"
+                  >
+                    {item.name}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          )
+        })}
+
+        <div className="pt-4 pb-2 px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+          {isSidebarOpen && "System Updates"}
+        </div>
+        {updatesNavigation.map((item) => {
+          const isActive = location.pathname === item.href || (location.pathname.startsWith('/updates') && item.href === '/updates' && location.pathname === '/updates')
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                isActive 
+                  ? 'bg-sky-600/20 text-sky-400' 
+                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 rounded-xl bg-sky-600/10 border border-sky-500/20"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <item.icon className={`w-5 h-5 flex-shrink-0 relative z-10 ${isActive ? 'text-sky-400' : ''}`} />
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="truncate font-medium relative z-10"
+                  >
+                    {item.name}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          )
+        })}
+
+        <div className="pt-4 pb-2 px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+          {isSidebarOpen && "VNAV AI"}
+        </div>
+        {aiNavigation.map((item) => {
+          const isActive = location.pathname === item.href || (location.pathname.startsWith('/ai') && item.href === '/ai')
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                isActive 
+                  ? 'bg-blue-600/20 text-blue-400' 
+                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 rounded-xl bg-blue-600/10 border border-blue-500/20"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <item.icon className={`w-5 h-5 flex-shrink-0 relative z-10 ${isActive ? 'text-blue-400' : ''}`} />
               <AnimatePresence>
                 {isSidebarOpen && (
                   <motion.span

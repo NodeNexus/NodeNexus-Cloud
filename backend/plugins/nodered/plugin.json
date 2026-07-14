@@ -1,0 +1,12 @@
+{
+  "id": "nodered",
+  "name": "NodeRED",
+  "description": "Official docker image for NodeRED.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "IoT",
+  "docker_image": "nodered/node-red:latest",
+  "ports": {
+    "1880": "1880"
+  }
+}

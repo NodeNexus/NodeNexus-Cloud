@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Terminal as TerminalIcon, RefreshCw, Download, Copy, Trash2 } from 'lucide-react';
+import { Plus, X, Terminal as TerminalIcon, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XTermWrapper } from '../components/terminal/XTermWrapper';
 
