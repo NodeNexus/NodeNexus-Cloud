@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from schemas.docker import ContainerInfo, ImageInfo, DockerActionResponse
+from schemas.docker import ContainerInfo, ImageInfo, DockerActionResponse, ContainerDetails, CreateContainerRequest, PullImageRequest, DockerPruneResponse
 from services.docker_service import DockerService
 
 router = APIRouter(prefix="/docker", tags=["Docker"])
@@ -35,3 +35,26 @@ async def delete_container(id: str, service: DockerService = Depends(get_docker_
 async def get_logs(id: str, service: DockerService = Depends(get_docker_service)):
     logs = await service.get_logs(id)
     return {"logs": logs}
+
+@router.get("/container/{id}", response_model=ContainerDetails)
+async def get_container_details(id: str, service: DockerService = Depends(get_docker_service)):
+    return await service.get_container_details(id)
+
+@router.post("/create", response_model=DockerActionResponse)
+async def create_container(req: CreateContainerRequest, service: DockerService = Depends(get_docker_service)):
+    return await service.create_container(
+        image=req.image,
+        name=req.name,
+        ports=req.ports,
+        env=req.env,
+        command=req.command
+    )
+
+@router.post("/pull", response_model=DockerActionResponse)
+async def pull_image(req: PullImageRequest, service: DockerService = Depends(get_docker_service)):
+    return await service.pull_image(req.image)
+
+@router.post("/prune", response_model=DockerPruneResponse)
+async def prune_system(service: DockerService = Depends(get_docker_service)):
+    return await service.prune_system()
+
