@@ -14,7 +14,12 @@ from routers import (
     monitoring,
     auth,
     users,
-    roles
+    roles,
+    cluster,
+    nodes,
+    pods,
+    deployments,
+    helm
 )
 
 settings_conf = get_settings()
@@ -55,6 +60,11 @@ app.include_router(monitoring.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(roles.router)
+app.include_router(cluster.router)
+app.include_router(nodes.router)
+app.include_router(pods.router)
+app.include_router(deployments.router)
+app.include_router(helm.router)
 
 @app.get("/health", tags=["Health"])
 async def health_check():

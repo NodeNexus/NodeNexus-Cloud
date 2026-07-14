@@ -15,7 +15,12 @@ import {
   Terminal,
   Folder,
   User,
-  Shield
+  Shield,
+  Server,
+  Network,
+  Layers,
+  Package,
+  Radio
 } from "lucide-react"
 import { useStore } from "@/store/useStore"
 
@@ -29,6 +34,15 @@ const navigation = [
   { name: 'Marketplace', href: '/marketplace', icon: Store },
   { name: 'Monitoring', href: '/monitoring', icon: Activity },
   { name: 'Settings', href: '/settings', icon: Settings },
+]
+
+const clusterNavigation = [
+  { name: 'Visual Cluster', href: '/cluster', icon: Network },
+  { name: 'Nodes', href: '/nodes', icon: Server },
+  { name: 'Pods', href: '/pods', icon: Box },
+  { name: 'Deployments', href: '/deployments', icon: Layers },
+  { name: 'Helm Charts', href: '/helm', icon: Package },
+  { name: 'Edge Devices', href: '/edge', icon: Radio },
 ]
 
 const adminNavigation = [
@@ -80,6 +94,46 @@ export const Sidebar = () => {
 
       <nav className="flex-1 overflow-y-auto p-4 space-y-1 scrollbar-hide">
         {navigation.map((item) => {
+          const isActive = location.pathname === item.href
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                isActive 
+                  ? 'bg-white/10 text-white' 
+                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 rounded-xl bg-white/10 border border-white/10"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <item.icon className="w-5 h-5 flex-shrink-0 relative z-10" />
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="truncate font-medium relative z-10"
+                  >
+                    {item.name}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          )
+        })}
+
+        <div className="pt-4 pb-2 px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+          {isSidebarOpen && "Kubernetes"}
+        </div>
+        {clusterNavigation.map((item) => {
           const isActive = location.pathname === item.href
           return (
             <Link

@@ -16,6 +16,13 @@ import { Roles } from "./pages/admin/Roles"
 import { ProtectedRoute } from "./components/auth/ProtectedRoute"
 import { AdminRoute } from "./components/auth/AdminRoute"
 
+import { Cluster } from "./pages/cluster/Cluster"
+import { Nodes } from "./pages/cluster/Nodes"
+import { Pods } from "./pages/cluster/Pods"
+import { Deployments } from "./pages/cluster/Deployments"
+import { Helm } from "./pages/cluster/Helm"
+import { EdgeDevices } from "./pages/cluster/EdgeDevices"
+
 const queryClient = new QueryClient()
 
 function App() {
@@ -36,6 +43,14 @@ function App() {
               <Route path="monitoring" element={<Monitoring />} />
               <Route path="settings" element={<Settings />} />
               <Route path="profile" element={<Profile />} />
+              
+              <Route path="cluster" element={<Cluster />} />
+              <Route path="nodes" element={<Nodes />} />
+              <Route path="pods" element={<Pods />} />
+              <Route path="deployments" element={<Deployments />} />
+              <Route path="helm" element={<Helm />} />
+              <Route path="edge" element={<EdgeDevices />} />
+
               <Route path="users" element={<AdminRoute><Users /></AdminRoute>} />
               <Route path="roles" element={<AdminRoute><Roles /></AdminRoute>} />
             </Route>
