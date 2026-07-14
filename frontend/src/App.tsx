@@ -8,6 +8,13 @@ import { Monitoring } from "./pages/Monitoring"
 import { Settings } from "./pages/Settings"
 import { TerminalPage } from "./pages/Terminal"
 import { FileManager } from "./pages/FileManager"
+import { Login } from "./pages/Login"
+import { Register } from "./pages/Register"
+import { Profile } from "./pages/Profile"
+import { Users } from "./pages/admin/Users"
+import { Roles } from "./pages/admin/Roles"
+import { ProtectedRoute } from "./components/auth/ProtectedRoute"
+import { AdminRoute } from "./components/auth/AdminRoute"
 
 const queryClient = new QueryClient()
 
@@ -16,14 +23,22 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<DashboardLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="containers" element={<Containers />} />
-            <Route path="terminal" element={<TerminalPage />} />
-            <Route path="files" element={<FileManager />} />
-            <Route path="marketplace" element={<Marketplace />} />
-            <Route path="monitoring" element={<Monitoring />} />
-            <Route path="settings" element={<Settings />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="containers" element={<Containers />} />
+              <Route path="terminal" element={<TerminalPage />} />
+              <Route path="files" element={<FileManager />} />
+              <Route path="marketplace" element={<Marketplace />} />
+              <Route path="monitoring" element={<Monitoring />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="users" element={<AdminRoute><Users /></AdminRoute>} />
+              <Route path="roles" element={<AdminRoute><Roles /></AdminRoute>} />
+            </Route>
           </Route>
         </Routes>
       </Router>
