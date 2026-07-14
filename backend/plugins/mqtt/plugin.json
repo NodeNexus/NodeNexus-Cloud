@@ -1,0 +1,12 @@
+{
+  "id": "mqtt",
+  "name": "Eclipse Mosquitto",
+  "description": "Official docker image for Eclipse Mosquitto.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "IoT",
+  "docker_image": "eclipse-mosquitto:latest",
+  "ports": {
+    "1883": "1883"
+  }
+}

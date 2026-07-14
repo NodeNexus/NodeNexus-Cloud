@@ -1,0 +1,12 @@
+{
+  "id": "k3s",
+  "name": "K3s",
+  "description": "Official docker image for K3s.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "Containers",
+  "docker_image": "rancher/k3s:latest",
+  "ports": {
+    "6443": "6443"
+  }
+}

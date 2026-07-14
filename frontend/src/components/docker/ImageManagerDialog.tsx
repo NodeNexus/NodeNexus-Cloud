@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Download, Trash2, HardDrive } from "lucide-react"
+import { X, Download, HardDrive } from "lucide-react"
 import { dockerApi } from "@/api/docker"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/Button"

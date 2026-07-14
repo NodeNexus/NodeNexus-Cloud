@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { k8sApi } from '../../api/kubernetes';
-import { Server, Cpu, HardDrive, Thermometer, Trash2, RotateCw } from 'lucide-react';
+import { Server, Cpu, HardDrive, Trash2, RotateCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Nodes = () => {

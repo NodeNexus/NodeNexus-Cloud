@@ -1,28 +1,54 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from services.system_service import SystemService
-from utils.logger import get_logger
-import asyncio
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from database import get_db
+from schemas.monitoring import SystemMetrics, AlertRuleSchema, AlertSchema, NotificationChannelSchema
+from models.monitoring import AlertRule, Alert, NotificationChannel
+from services.monitoring_service import MonitoringService
 
-logger = get_logger(__name__)
 router = APIRouter(prefix="/monitoring", tags=["Monitoring"])
 
-@router.get("/status")
-async def monitoring_status():
-    return {"status": "Monitoring service is active with WebSocket streaming."}
+@router.get("/metrics", response_model=SystemMetrics)
+async def get_metrics():
+    return MonitoringService.get_system_metrics()
 
-@router.websocket("/ws/realtime")
-async def websocket_realtime_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    logger.info("Client connected to real-time WebSocket.")
-    try:
-        while True:
-            # Fetch latest stats
-            stats = await SystemService.get_system_stats()
-            # Send stats as JSON
-            await websocket.send_json(stats.model_dump())
-            # Wait for 1 second before next update
-            await asyncio.sleep(1)
-    except WebSocketDisconnect:
-        logger.info("Client disconnected from real-time WebSocket.")
-    except Exception as e:
-        logger.error(f"WebSocket error: {e}")
+@router.get("/rules", response_model=list[AlertRuleSchema])
+async def list_rules(db: AsyncSession = Depends(get_db)):
+    res = await db.execute(select(AlertRule))
+    return res.scalars().all()
+
+@router.post("/rules")
+async def create_rule(rule: AlertRuleSchema, db: AsyncSession = Depends(get_db)):
+    new_rule = AlertRule(
+        name=rule.name,
+        metric=rule.metric,
+        condition=rule.condition,
+        threshold=rule.threshold,
+        is_active=rule.is_active
+    )
+    db.add(new_rule)
+    await db.commit()
+    return {"status": "success"}
+
+@router.get("/alerts", response_model=list[AlertSchema])
+async def list_alerts(db: AsyncSession = Depends(get_db)):
+    res = await db.execute(select(Alert))
+    return res.scalars().all()
+
+@router.get("/channels", response_model=list[NotificationChannelSchema])
+async def list_channels(db: AsyncSession = Depends(get_db)):
+    res = await db.execute(select(NotificationChannel))
+    return res.scalars().all()
+
+@router.post("/channels")
+async def create_channel(channel: NotificationChannelSchema, db: AsyncSession = Depends(get_db)):
+    new_channel = NotificationChannel(
+        type=channel.type,
+        name=channel.name,
+        webhook_url=channel.webhook_url,
+        config=channel.config,
+        is_active=channel.is_active
+    )
+    db.add(new_channel)
+    await db.commit()
+    return {"status": "success"}

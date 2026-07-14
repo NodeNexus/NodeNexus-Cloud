@@ -1,0 +1,12 @@
+{
+  "id": "nginxproxymanager",
+  "name": "Nginx Proxy Manager",
+  "description": "Official docker image for Nginx Proxy Manager.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "Networking",
+  "docker_image": "jc21/nginx-proxy-manager:latest",
+  "ports": {
+    "81": "81"
+  }
+}

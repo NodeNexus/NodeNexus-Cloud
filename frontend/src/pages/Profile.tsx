@@ -1,5 +1,5 @@
 import { useStore } from '../store/useStore';
-import { User, Mail, Shield, Clock } from 'lucide-react';
+import { User, Mail, Shield } from 'lucide-react';
 
 export const Profile = () => {
   const { user } = useStore();

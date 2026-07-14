@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
-import { User, Shield, Trash2, Edit } from 'lucide-react';
+import { Shield, Trash2, Edit } from 'lucide-react';
 
 export const Users = () => {
   const { token } = useStore();

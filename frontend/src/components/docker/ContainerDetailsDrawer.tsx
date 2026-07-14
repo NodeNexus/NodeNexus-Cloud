@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Activity, Server, Network, Clock, Box, Hash, Terminal } from "lucide-react"
-import { ContainerInfo, ContainerDetails, dockerApi } from "@/api/docker"
+import { ContainerInfo, dockerApi } from "@/api/docker"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/Button"
 
@@ -14,7 +13,7 @@ export const ContainerDetailsDrawer = ({
   onClose: () => void,
   onOpenLogs: (c: ContainerInfo) => void
 }) => {
-  const { data: details, isLoading } = useQuery({
+  const { data: details } = useQuery({
     queryKey: ['container-details', container?.id],
     queryFn: () => dockerApi.getContainerDetails(container!.id),
     enabled: !!container,

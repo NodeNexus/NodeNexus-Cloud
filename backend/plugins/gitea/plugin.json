@@ -1,0 +1,12 @@
+{
+  "id": "gitea",
+  "name": "Gitea",
+  "description": "Official docker image for Gitea.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "Development",
+  "docker_image": "gitea/gitea:latest",
+  "ports": {
+    "3000": "3000"
+  }
+}

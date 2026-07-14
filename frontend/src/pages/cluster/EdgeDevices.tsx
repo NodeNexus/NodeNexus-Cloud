@@ -1,4 +1,4 @@
-import { Wifi, Cpu, Thermometer, Radio } from 'lucide-react';
+import { Wifi, Thermometer, Radio } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const EdgeDevices = () => {

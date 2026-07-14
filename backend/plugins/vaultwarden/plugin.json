@@ -1,0 +1,12 @@
+{
+  "id": "vaultwarden",
+  "name": "Vaultwarden",
+  "description": "Official docker image for Vaultwarden.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "Security",
+  "docker_image": "vaultwarden/server:latest",
+  "ports": {
+    "80": "80"
+  }
+}

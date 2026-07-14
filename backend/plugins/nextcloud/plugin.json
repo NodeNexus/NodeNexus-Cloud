@@ -1,0 +1,12 @@
+{
+  "id": "nextcloud",
+  "name": "Nextcloud",
+  "description": "Official docker image for Nextcloud.",
+  "version": "latest",
+  "author": "VNAV Cloud",
+  "category": "Storage",
+  "docker_image": "nextcloud:latest",
+  "ports": {
+    "80": "80"
+  }
+}
