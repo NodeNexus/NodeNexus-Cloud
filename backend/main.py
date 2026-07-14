@@ -11,7 +11,10 @@ from routers import (
     terminal,
     marketplace,
     settings,
-    monitoring
+    monitoring,
+    auth,
+    users,
+    roles
 )
 
 settings_conf = get_settings()
@@ -49,6 +52,9 @@ app.include_router(terminal.router)
 app.include_router(marketplace.router)
 app.include_router(settings.router)
 app.include_router(monitoring.router)
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(roles.router)
 
 @app.get("/health", tags=["Health"])
 async def health_check():
