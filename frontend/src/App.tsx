@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react"
-import { Routes, Route, Navigate } from "react"
+import { Routes, Route, Navigate } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { Layout } from "./layouts/Layout"
+import { DashboardLayout as Layout } from "./layouts/DashboardLayout"
 import { AuthLayout } from "./layouts/AuthLayout"
 import { GlobalLoader } from "./components/GlobalLoader"
 
