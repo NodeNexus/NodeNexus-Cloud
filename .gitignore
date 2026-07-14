@@ -1,0 +1,16 @@
+node_modules
+dist
+build
+coverage
+__pycache__
+.pytest_cache
+*.pyc
+*.db
+*.sqlite3
+.env
+.env.local
+.venv
+.vscode
+.idea
+logs
+*.log
