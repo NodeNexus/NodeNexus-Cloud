@@ -11,12 +11,16 @@ import {
   Settings, 
   Bot, 
   LogOut,
-  ChevronLeft
+  ChevronLeft,
+  Terminal,
+  Folder
 } from "lucide-react"
 import { useStore } from "@/store/useStore"
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Terminal', href: '/terminal', icon: Terminal },
+  { name: 'Files', href: '/files', icon: Folder },
   { name: 'Containers', href: '/containers', icon: Box },
   { name: 'Marketplace', href: '/marketplace', icon: Store },
   { name: 'Storage', href: '/storage', icon: HardDrive },
