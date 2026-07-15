@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { fetchWithAuth } from '../../api/client';
 import { useStore } from '../../store/useStore';
 import { Shield, Trash2, Edit } from 'lucide-react';
 
@@ -10,13 +11,9 @@ export const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/users', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUsers(data);
-        }
+        const data = await fetchWithAuth('/users', token);
+        setUsers(data);
+
       } catch (e) {
         console.error(e);
       } finally {

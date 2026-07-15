@@ -48,9 +48,7 @@ export const XTermWrapper: React.FC<XTermWrapperProps> = ({ cwd = "/", onDisconn
 
     // Initialize WebSocket
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // Use localhost:8000 since Vite runs on 5173 but our API is typically on 8000
-    // We should ideally use the same host but port 8000, or proxy.
-    const wsUrl = `${wsProtocol}//127.0.0.1:8000/terminal/ws?cwd=${encodeURIComponent(cwd)}`;
+    const wsUrl = `${wsProtocol}//${window.location.host}/api/terminal/ws?cwd=${encodeURIComponent(cwd)}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {

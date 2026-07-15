@@ -1,16 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000";
-
-const fetchWithAuth = async (url: string, token: string | null, options: any = {}) => {
-  const headers = {
-    ...options.headers,
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json"
-  };
-  const res = await fetch(`${API_BASE}${url}`, { ...options, headers });
-  if (!res.ok) throw new Error(`API Error: ${res.statusText}`);
-  return res.json();
-};
-
+import { API_BASE, fetchWithAuth } from './client';
 export const aiApi = {
   getModels: (token: string | null) => fetchWithAuth("/ai/models", token),
   getHistory: (token: string | null) => fetchWithAuth("/ai/history", token),

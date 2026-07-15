@@ -32,7 +32,8 @@ export interface DockerPruneResponse {
   space_reclaimed: number;
 }
 
-const API_URL = 'http://localhost:8000/docker';
+import { API_BASE } from './client';
+const API_URL = `${API_BASE}/docker`;
 
 export const dockerApi = {
   getContainers: async (): Promise<ContainerInfo[]> => {

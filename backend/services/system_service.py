@@ -8,7 +8,6 @@ from services.docker_service import DockerService
 class SystemService:
     _last_net_io: Optional[dict] = None
     _last_net_time: float = 0
-    _docker_service = DockerService()
 
     @classmethod
     async def get_system_stats(cls) -> SystemStats:
@@ -59,14 +58,17 @@ class SystemService:
         docker_images = 0
         containers_status = []
         
-        if cls._docker_service.client:
-            try:
-                containers = cls._docker_service.client.containers.list(all=True)
+        try:
+            ds = DockerService()
+            if ds.client:
+                containers = await ds.list_containers()
                 docker_containers = len(containers)
-                containers_status = [DockerSimpleStat(name=c.name, status=c.status) for c in containers[:5]] # Limit to 5 for dashboard
-                docker_images = len(cls._docker_service.client.images.list())
-            except Exception:
-                pass
+                containers_status = [DockerSimpleStat(name=c.name, status=c.status) for c in containers[:5]]
+                
+                images = await ds.list_images()
+                docker_images = len(images)
+        except Exception:
+            pass
 
         return SystemStats(
             hostname=hostname,

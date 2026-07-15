@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 import logging
 import docker
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -38,33 +39,33 @@ class BackupService:
             logger.error(f"Failed to backup {container_name}: {e}")
             return False
 
-    def create_snapshot(self, name: str, description: str, targets: list[str], encrypt: bool = False) -> dict:
+    async def create_snapshot(self, name: str, description: str, targets: list[str], encrypt: bool = False) -> dict:
         snapshot_id = str(uuid.uuid4())
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_name = name.replace(" ", "_").lower()
         
         snapshot_folder = os.path.join(self.backup_dir, f"{safe_name}_{timestamp}_{snapshot_id}")
-        os.makedirs(snapshot_folder, exist_ok=True)
+        await asyncio.to_thread(os.makedirs, snapshot_folder, exist_ok=True)
 
         for target in targets:
             if target == "sqlite":
-                self._backup_sqlite(snapshot_folder)
+                await asyncio.to_thread(self._backup_sqlite, snapshot_folder)
             elif target == "postgresql":
-                self._backup_docker_volume("vnav-plugin-postgresql", snapshot_folder)
+                await asyncio.to_thread(self._backup_docker_volume, "vnav-plugin-postgresql", snapshot_folder)
             elif target == "redis":
-                self._backup_docker_volume("vnav-plugin-redis", snapshot_folder)
+                await asyncio.to_thread(self._backup_docker_volume, "vnav-plugin-redis", snapshot_folder)
             elif target == "minio":
-                self._backup_docker_volume("vnav-plugin-minio", snapshot_folder)
+                await asyncio.to_thread(self._backup_docker_volume, "vnav-plugin-minio", snapshot_folder)
             else:
                 # Fallback for generic plugins or configs
-                self._backup_docker_volume(f"vnav-plugin-{target}", snapshot_folder)
+                await asyncio.to_thread(self._backup_docker_volume, f"vnav-plugin-{target}", snapshot_folder)
 
         # Compress
         archive_name = os.path.join(self.backup_dir, f"{safe_name}_{timestamp}.zip")
-        shutil.make_archive(archive_name.replace('.zip', ''), 'zip', snapshot_folder)
+        await asyncio.to_thread(shutil.make_archive, archive_name.replace('.zip', ''), 'zip', snapshot_folder)
         
         # Cleanup uncompressed folder
-        shutil.rmtree(snapshot_folder)
+        await asyncio.to_thread(shutil.rmtree, snapshot_folder)
 
         # Calculate size
         size_mb = os.path.getsize(archive_name) / (1024 * 1024)
@@ -78,8 +79,8 @@ class BackupService:
             "is_encrypted": encrypt
         }
 
-    def restore_snapshot(self, filepath: str, targets: list[str] = None):
-        if not os.path.exists(filepath):
+    async def restore_snapshot(self, filepath: str, targets: list[str] = None):
+        if not await asyncio.to_thread(os.path.exists, filepath):
             raise Exception("Backup file not found")
         # Logic to unzip and restore to designated places goes here.
         # This is destructive!
