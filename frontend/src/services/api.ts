@@ -8,7 +8,7 @@ export interface SystemStats {
   disk_total: number;
 }
 
-const API_BASE_URL = 'http://localhost:8000'; // Assuming standard FastAPI port
+const API_BASE_URL = '/api';
 
 export const fetchSystemStats = async (): Promise<SystemStats> => {
   try {

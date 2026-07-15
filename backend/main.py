@@ -26,7 +26,6 @@ from routers import (
     automation,
     knowledge,
     plugins,
-    monitoring,
     backups,
     updates
 )
@@ -82,7 +81,6 @@ app.include_router(chat.router)
 app.include_router(automation.router)
 app.include_router(knowledge.router)
 app.include_router(plugins.router)
-app.include_router(monitoring.router)
 app.include_router(backups.router)
 app.include_router(updates.router)
 

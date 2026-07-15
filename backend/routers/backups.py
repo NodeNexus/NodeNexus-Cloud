@@ -18,7 +18,7 @@ async def list_snapshots(db: AsyncSession = Depends(get_db)):
 @router.post("/snapshots")
 async def create_snapshot(req: CreateSnapshotRequest, db: AsyncSession = Depends(get_db)):
     try:
-        result = backup_service.create_snapshot(
+        result = await backup_service.create_snapshot(
             name=req.name, 
             description=req.description, 
             targets=req.targets, 
@@ -47,7 +47,7 @@ async def restore_snapshot(snapshot_id: int, db: AsyncSession = Depends(get_db))
         raise HTTPException(status_code=404, detail="Snapshot not found")
         
     try:
-        backup_service.restore_snapshot(snapshot.filepath)
+        await backup_service.restore_snapshot(snapshot.filepath)
         return {"status": "success", "message": f"Restored {snapshot.name}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

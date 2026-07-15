@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore, type SystemStats } from '@/store/useStore';
 
-const WS_URL = 'ws://localhost:8000/monitoring/ws/realtime';
+const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/monitoring/ws/realtime`;
 
 export const useWebSocket = () => {
   const { setSystemStats } = useStore();

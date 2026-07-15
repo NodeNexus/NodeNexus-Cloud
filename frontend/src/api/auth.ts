@@ -1,8 +1,8 @@
-const API_BASE = "http://127.0.0.1:8000/auth";
+import { API_BASE } from './client';
 
 export const authApi = {
   login: async (email: string, password: string, remember_me: boolean = false) => {
-    const res = await fetch(`${API_BASE}/login`, {
+    const res = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, remember_me })
@@ -11,7 +11,7 @@ export const authApi = {
     return res.json();
   },
   register: async (data: any) => {
-    const res = await fetch(`${API_BASE}/register`, {
+    const res = await fetch(`${API_BASE}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
@@ -23,7 +23,7 @@ export const authApi = {
     return res.json();
   },
   getMe: async (token: string) => {
-    const res = await fetch(`${API_BASE}/me`, {
+    const res = await fetch(`${API_BASE}/auth/me`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!res.ok) throw new Error("Failed to fetch profile");

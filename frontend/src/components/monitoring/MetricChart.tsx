@@ -29,7 +29,7 @@ export const MetricChart = ({ data, dataKey, color = "#3b82f6", title, unit = ""
               <Tooltip 
                 contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}
                 itemStyle={{ color: '#fff' }}
-                formatter={(val: number) => [`${val.toFixed(1)}${unit}`, title]}
+                formatter={(val: any) => [`${Number(val).toFixed(1)}${unit}`, title]}
               />
               <Area type="monotone" dataKey={dataKey} stroke={color} fillOpacity={1} fill={`url(#color-${dataKey})`} strokeWidth={3} />
             </AreaChart>
@@ -41,7 +41,7 @@ export const MetricChart = ({ data, dataKey, color = "#3b82f6", title, unit = ""
               <Tooltip 
                 contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}
                 itemStyle={{ color: '#fff' }}
-                formatter={(val: number) => [`${val.toFixed(1)}${unit}`, title]}
+                formatter={(val: any) => [`${Number(val).toFixed(1)}${unit}`, title]}
               />
               <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
             </LineChart>
