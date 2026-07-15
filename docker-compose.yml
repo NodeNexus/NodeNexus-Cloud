@@ -1,50 +1,21 @@
-
 services:
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: vnav-console-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
+
   backend:
     build: 
       context: ./backend
-      dockerfile: Dockerfile
-    container_name: vnav-backend-prod
-    restart: always
-    environment:
-      - DATABASE_URL=sqlite+aiosqlite:////app/data/vnav.db
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - ENVIRONMENT=production
-    volumes:
-      - vnav_db_data:/app/data
-      - vnav_plugins_data:/app/plugins
-      - /var/run/docker.sock:/var/run/docker.sock
+    container_name: vnav-console-backend
     ports:
       - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    networks:
-      - vnav-network
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: vnav-frontend-prod
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      - NGINX_HOST=localhost
-    depends_on:
-      backend:
-        condition: service_healthy
-    networks:
-      - vnav-network
-
-networks:
-  vnav-network:
-    driver: bridge
-
-volumes:
-  vnav_db_data:
-  vnav_plugins_data:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./core-infra:/app/core-infra
+    restart: unless-stopped
