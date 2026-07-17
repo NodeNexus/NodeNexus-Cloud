@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import ec2, vpc, ebs, iam, s3, rds, dynamodb, lambda_router
+from routers import ec2, vpc, ebs, iam, s3, rds, dynamodb, lambda_router, system
 from core.database import engine, Base
 import asyncio
 
@@ -27,6 +27,7 @@ app.include_router(s3.router)
 app.include_router(rds.router)
 app.include_router(dynamodb.router)
 app.include_router(lambda_router.router)
+app.include_router(system.router)
 
 @app.get("/health")
 async def health_check():
