@@ -1,16 +1,63 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Play, Square, RefreshCw, Plus } from "lucide-react";
+import { fetchApi } from "@/lib/api";
 
-const instances = [
-  { id: "i-09f3b2a", name: "vnav-web-backend", type: "t2.micro", status: "running", ip: "172.18.0.3" },
-  { id: "i-02a8c91", name: "vnav-web-frontend", type: "t2.micro", status: "running", ip: "172.18.0.4" },
-  { id: "i-05b1f7e", name: "worker-node-1", type: "t2.small", status: "stopped", ip: "-" },
-];
+interface Instance {
+  id: string;
+  name: string;
+  status: string;
+  image: string;
+  created: string;
+}
 
 export function EC2() {
+  const [instances, setInstances] = useState<Instance[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadInstances = async () => {
+    setRefreshing(true);
+    try {
+      const data = await fetchApi("/ec2/instances");
+      setInstances(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadInstances();
+  }, []);
+
+  const handleLaunch = async () => {
+    setLoading(true);
+    try {
+      await fetchApi("/ec2/instances", {
+        method: "POST",
+        body: JSON.stringify({ image: "nginx:alpine", instance_type: "t2.micro" })
+      });
+      loadInstances();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTerminate = async (id: string) => {
+    try {
+      await fetchApi(`/ec2/instances/${id}`, { method: "DELETE" });
+      loadInstances();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -19,8 +66,12 @@ export function EC2() {
           <p className="text-text-secondary">Manage your Docker-backed virtual instances.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm"><RefreshCw size={14} className="mr-2" /> Refresh</Button>
-          <Button size="sm"><Plus size={14} className="mr-2" /> Launch Instance</Button>
+          <Button variant="outline" size="sm" onClick={loadInstances} disabled={refreshing}>
+            <RefreshCw size={14} className={`mr-2 ${refreshing ? "animate-spin" : ""}`} /> Refresh
+          </Button>
+          <Button size="sm" onClick={handleLaunch} disabled={loading}>
+            <Plus size={14} className="mr-2" /> Launch Instance
+          </Button>
         </div>
       </div>
 
@@ -35,27 +86,33 @@ export function EC2() {
               <TableHead className="w-12"><input type="checkbox" className="rounded border-border bg-surface-active" /></TableHead>
               <TableHead>Instance ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Instance Type</TableHead>
+              <TableHead>Image</TableHead>
               <TableHead>State</TableHead>
-              <TableHead>Private IP</TableHead>
+              <TableHead>Created At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {instances.map((i) => (
+            {instances.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-text-tertiary py-8">
+                  No instances running.
+                </TableCell>
+              </TableRow>
+            ) : instances.map((i) => (
               <TableRow key={i.id}>
                 <TableCell><input type="checkbox" className="rounded border-border bg-surface-active" /></TableCell>
                 <TableCell className="font-mono text-primary">{i.id}</TableCell>
                 <TableCell className="font-medium">{i.name}</TableCell>
-                <TableCell>{i.type}</TableCell>
+                <TableCell className="font-mono text-sm">{i.image}</TableCell>
                 <TableCell>
                   <Badge variant={i.status === "running" ? "success" : "default"}>
                     {i.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-mono text-text-secondary">{i.ip}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="sm">Manage</Button>
+                <TableCell className="text-text-secondary text-sm">{new Date(i.created).toLocaleString()}</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <Button variant="ghost" size="sm" onClick={() => handleTerminate(i.id)}>Terminate</Button>
                 </TableCell>
               </TableRow>
             ))}

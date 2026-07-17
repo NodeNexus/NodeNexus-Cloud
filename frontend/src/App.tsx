@@ -4,6 +4,10 @@ import { AppLayout } from './layouts/AppLayout';
 import { Dashboard } from './pages/Dashboard';
 import { EC2 } from './pages/compute/EC2';
 import { S3 } from './pages/storage/S3';
+import { EBS } from './pages/storage/EBS';
+import { RDS } from './pages/storage/RDS';
+import { VPC } from './pages/networking/VPC';
+import { IAM } from './pages/security/IAM';
 import { Monitoring } from './pages/tools/Monitoring';
 import { Marketplace } from './pages/tools/Marketplace';
 import { Terminal } from './pages/tools/Terminal';
@@ -20,11 +24,11 @@ function App() {
           <Route path="compute/containers" element={<div className="p-6">Containers Page (Coming Soon)</div>} />
           
           <Route path="storage/s3" element={<S3 />} />
-          <Route path="storage/ebs" element={<div className="p-6">EBS Volumes (Coming Soon)</div>} />
-          <Route path="storage/rds" element={<div className="p-6">Databases (Coming Soon)</div>} />
+          <Route path="storage/ebs" element={<EBS />} />
+          <Route path="storage/rds" element={<RDS />} />
           
-          <Route path="networking/vpc" element={<div className="p-6">VPC Networks (Coming Soon)</div>} />
-          <Route path="security/iam" element={<div className="p-6">IAM & Users (Coming Soon)</div>} />
+          <Route path="networking/vpc" element={<VPC />} />
+          <Route path="security/iam" element={<IAM />} />
           
           <Route path="tools/monitoring" element={<Monitoring />} />
           <Route path="tools/marketplace" element={<Marketplace />} />

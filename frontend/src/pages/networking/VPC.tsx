@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
-import { HardDrive, Plus, RefreshCw } from "lucide-react";
+import { Network, Plus, RefreshCw } from "lucide-react";
 import { fetchApi } from "@/lib/api";
 
-interface Bucket {
+interface NetworkInfo {
+  id: string;
   name: string;
-  creation_date: string;
+  driver: string;
 }
 
-export function S3() {
-  const [buckets, setBuckets] = useState<Bucket[]>([]);
+export function VPC() {
+  const [networks, setNetworks] = useState<NetworkInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadBuckets = async () => {
+  const loadNetworks = async () => {
     setRefreshing(true);
     try {
-      const data = await fetchApi("/s3/buckets");
-      setBuckets(data);
+      const data = await fetchApi("/vpc/networks");
+      setNetworks(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -27,36 +28,36 @@ export function S3() {
   };
 
   useEffect(() => {
-    loadBuckets();
+    loadNetworks();
   }, []);
 
   const handleCreate = async () => {
-    const name = prompt("Enter bucket name (lowercase, no spaces):");
+    const name = prompt("Enter network name (e.g. vnav-net-1):");
     if (!name) return;
     
     setLoading(true);
     try {
-      await fetchApi("/s3/buckets", {
+      await fetchApi("/vpc/networks", {
         method: "POST",
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name, driver: "bridge" })
       });
-      loadBuckets();
+      loadNetworks();
     } catch (err) {
       console.error(err);
-      alert("Failed to create bucket");
+      alert("Failed to create network");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (name: string) => {
-    if (!confirm(`Are you sure you want to delete bucket ${name}?`)) return;
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete network ${name}?`)) return;
     try {
-      await fetchApi(`/s3/buckets/${name}`, { method: "DELETE" });
-      loadBuckets();
+      await fetchApi(`/vpc/networks/${id}`, { method: "DELETE" });
+      loadNetworks();
     } catch (err) {
       console.error(err);
-      alert("Failed to delete bucket");
+      alert("Failed to delete network");
     }
   };
 
@@ -64,15 +65,15 @@ export function S3() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">S3 Buckets</h1>
-          <p className="text-text-secondary">Object storage powered by MinIO.</p>
+          <h1 className="text-2xl font-bold text-text-primary">VPC Networks</h1>
+          <p className="text-text-secondary">Manage your Docker networks.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={loadBuckets} disabled={refreshing}>
+          <Button variant="outline" size="sm" onClick={loadNetworks} disabled={refreshing}>
             <RefreshCw size={14} className={`mr-2 ${refreshing ? "animate-spin" : ""}`} /> Refresh
           </Button>
           <Button size="sm" onClick={handleCreate} disabled={loading}>
-            <Plus size={14} className="mr-2" /> Create Bucket
+            <Plus size={14} className="mr-2" /> Create Network
           </Button>
         </div>
       </div>
@@ -81,28 +82,28 @@ export function S3() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Network ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Creation Date</TableHead>
+              <TableHead>Driver</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {buckets.length === 0 ? (
+            {networks.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-text-tertiary py-8">
-                  No buckets found.
+                <TableCell colSpan={4} className="text-center text-text-tertiary py-8">
+                  No networks found.
                 </TableCell>
               </TableRow>
-            ) : buckets.map((b) => (
-              <TableRow key={b.name}>
-                <TableCell className="font-medium text-primary flex items-center gap-2">
-                  <HardDrive size={16} /> {b.name}
+            ) : networks.map((n) => (
+              <TableRow key={n.id}>
+                <TableCell className="font-mono text-primary">{n.id}</TableCell>
+                <TableCell className="font-medium flex items-center gap-2">
+                  <Network size={16} /> {n.name}
                 </TableCell>
-                <TableCell className="text-text-secondary">
-                  {new Date(b.creation_date).toLocaleString()}
-                </TableCell>
+                <TableCell className="text-text-secondary">{n.driver}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(b.name)}>
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(n.id, n.name)}>
                     Delete
                   </Button>
                 </TableCell>
