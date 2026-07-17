@@ -1,59 +1,155 @@
-import React from "react";
-import { Folder, File, Upload, Download, Trash, Edit2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Folder, File, Upload, CornerLeftUp } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
+import { fetchApi } from "@/lib/api";
 
-const files = [
-  { name: "docker-compose.yml", type: "file", size: "2.4 KB", modified: "Today, 10:23 AM" },
-  { name: "nginx.conf", type: "file", size: "1.1 KB", modified: "Yesterday, 14:05 PM" },
-  { name: "src", type: "folder", size: "--", modified: "Oct 12, 2023" },
-  { name: "logs", type: "folder", size: "--", modified: "Oct 10, 2023" },
-];
+interface FileItem {
+  name: string;
+  type: "file" | "folder";
+  size: string;
+  modified: string;
+}
+
+interface Container {
+  id: string;
+  name: string;
+}
 
 export function Files() {
+  const [containers, setContainers] = useState<Container[]>([]);
+  const [selectedContainer, setSelectedContainer] = useState<string>("");
+  const [currentPath, setCurrentPath] = useState<string>("/tmp");
+  const [files, setFiles] = useState<FileItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchApi("/system/containers").then(setContainers).catch(console.error);
+  }, []);
+
+  const loadFiles = async () => {
+    if (!selectedContainer) return;
+    setLoading(true);
+    try {
+      const data = await fetchApi(`/files/${selectedContainer}/list?path=${encodeURIComponent(currentPath)}`);
+      setFiles(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFiles();
+  }, [selectedContainer, currentPath]);
+
+  const handleNavigate = (folderName: string) => {
+    let newPath = currentPath;
+    if (newPath.endsWith("/")) newPath += folderName;
+    else newPath += "/" + folderName;
+    setCurrentPath(newPath);
+  };
+
+  const handleGoUp = () => {
+    if (currentPath === "/" || currentPath === "") return;
+    const parts = currentPath.split("/").filter(Boolean);
+    parts.pop();
+    setCurrentPath("/" + parts.join("/"));
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files.length || !selectedContainer) return;
+    
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("path", currentPath);
+
+    try {
+      setLoading(true);
+      await fetch(`http://localhost:8000/api/files/${selectedContainer}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      loadFiles();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">File Explorer</h1>
-          <p className="text-text-secondary">Manage local volume files.</p>
+          <p className="text-text-secondary">Manage files directly inside your running containers.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm"><Upload size={14} className="mr-2" /> Upload</Button>
+          <select 
+            className="bg-surface text-text-primary border border-border rounded-md px-3 py-1.5 text-sm outline-none focus:border-primary"
+            value={selectedContainer}
+            onChange={(e) => setSelectedContainer(e.target.value)}
+          >
+            <option value="">Select container...</option>
+            {containers.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+          
+          <label className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-surface-hover text-text-primary h-9 px-3 py-2 gap-2">
+            <Upload size={14} /> Upload
+            <input type="file" className="hidden" onChange={handleUpload} disabled={!selectedContainer} />
+          </label>
         </div>
       </div>
 
-      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      <div className="bg-surface border border-border rounded-lg overflow-hidden min-h-[400px]">
         <div className="p-3 border-b border-border bg-surface-active/30 flex items-center gap-2 text-sm text-text-secondary font-mono">
-          <span>/</span>
-          <span className="hover:text-primary cursor-pointer transition-colors">var</span>
-          <span>/</span>
-          <span className="hover:text-primary cursor-pointer transition-colors">lib</span>
-          <span>/</span>
-          <span className="text-text-primary font-semibold">docker</span>
+          <Button variant="ghost" size="sm" onClick={handleGoUp} disabled={currentPath === "/" || !selectedContainer} className="h-6 px-2 mr-2">
+            <CornerLeftUp size={14} />
+          </Button>
+          <span className="text-text-primary font-semibold">{currentPath}</span>
         </div>
+        
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Size</TableHead>
               <TableHead>Last Modified</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {files.map((f) => (
+            {!selectedContainer ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center text-text-tertiary py-12">
+                  Select a container to view its files.
+                </TableCell>
+              </TableRow>
+            ) : files.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center text-text-tertiary py-8">
+                  {loading ? "Loading..." : "This directory is empty."}
+                </TableCell>
+              </TableRow>
+            ) : files.map((f) => (
               <TableRow key={f.name}>
                 <TableCell className="font-medium flex items-center gap-3">
-                  {f.type === "folder" ? <Folder className="text-info" size={18} /> : <File className="text-text-secondary" size={18} />}
-                  {f.name}
+                  {f.type === "folder" ? (
+                    <div className="flex items-center gap-3 cursor-pointer hover:text-primary transition-colors" onClick={() => handleNavigate(f.name)}>
+                      <Folder className="text-info" size={18} /> {f.name}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <File className="text-text-secondary" size={18} /> {f.name}
+                    </div>
+                  )}
                 </TableCell>
-                <TableCell className="text-text-secondary">{f.size}</TableCell>
-                <TableCell className="text-text-secondary">{f.modified}</TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-text-tertiary hover:text-text-primary"><Edit2 size={14} /></Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-text-tertiary hover:text-danger"><Trash size={14} /></Button>
-                </TableCell>
+                <TableCell className="text-text-secondary font-mono text-sm">{f.size}</TableCell>
+                <TableCell className="text-text-secondary text-sm">{f.modified}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -12,7 +12,16 @@ class CreateTableRequest(BaseModel):
 @router.post("/tables")
 async def create_table(req: CreateTableRequest):
     try:
-        image = "mongo:latest" if req.engine == "mongo" else "redis:alpine"
         return await rds_service.create_database(engine=req.engine, instance_type=req.instance_type)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/tables")
+async def get_tables():
+    from services.ec2_service import ec2_service
+    instances = await ec2_service.list_instances()
+    return [i for i in instances if any(db in i["image"] for db in ["mongo", "redis"])]
+
+@router.delete("/tables/{table_id}")
+async def delete_table(table_id: str):
+    return await rds_service.delete_database(table_id)

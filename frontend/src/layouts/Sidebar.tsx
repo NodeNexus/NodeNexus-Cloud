@@ -10,18 +10,24 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { group: "Overview", items: [{ name: "Dashboard", icon: LayoutDashboard, path: "/" }] },
+  { group: "Overview", items: [
+    { name: "Dashboard", icon: LayoutDashboard, path: "/" },
+    { name: "Billing", icon: Activity, path: "/billing" }
+  ]},
   { group: "Compute", items: [
     { name: "EC2 Instances", icon: Server, path: "/compute/ec2" },
+    { name: "Lambda Functions", icon: Box, path: "/compute/lambda" },
     { name: "Containers", icon: Box, path: "/compute/containers" },
   ]},
   { group: "Storage", items: [
     { name: "S3 Buckets", icon: HardDrive, path: "/storage/s3" },
     { name: "EBS Volumes", icon: HardDrive, path: "/storage/ebs" },
-    { name: "Databases", icon: Database, path: "/storage/rds" },
+    { name: "RDS Databases", icon: Database, path: "/storage/rds" },
+    { name: "DynamoDB Tables", icon: Database, path: "/storage/dynamodb" },
   ]},
   { group: "Network & Security", items: [
     { name: "VPC Networks", icon: Network, path: "/networking/vpc" },
+    { name: "API Gateway", icon: Network, path: "/networking/gateway" },
     { name: "IAM & Users", icon: Users, path: "/security/iam" },
   ]},
   { group: "Tools", items: [
