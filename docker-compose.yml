@@ -37,9 +37,9 @@ services:
       # Legacy volume mount (keep for compatibility)
       - ./core-infra:/app/core-infra
     restart: unless-stopped
-    # P3: Health check so Docker restarts unhealthy backend
+    # P3: Health check — uses Python (always available) instead of curl (not in slim image)
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
