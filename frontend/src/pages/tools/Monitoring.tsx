@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Activity, Terminal, WifiOff, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { fetchApi } from "@/lib/api";
+import { fetchApi, WS_BASE } from "@/lib/api";
 
 const mockNetwork = [
   { time: "10:00", in: 120, out: 80 },
@@ -64,7 +64,7 @@ export function Monitoring() {
     logBufferRef.current = [];
     if (attempt === 0) setLogs(["Connecting to log stream..."]);
 
-    const ws = new WebSocket(`ws://localhost:8000/api/system/ws/logs/${containerId}`);
+    const ws = new WebSocket(`${WS_BASE}/api/system/ws/logs/${containerId}`);
     wsRef.current = ws;
 
     ws.onopen = () => {

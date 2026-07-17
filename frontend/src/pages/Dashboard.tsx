@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/Badge";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Server, Activity, HardDrive, Database, AlertCircle } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 interface DashboardMetrics {
   timestamp: number;
@@ -30,7 +31,7 @@ export function Dashboard() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/system/dashboard");
+        const res = await fetch(`${API_BASE}/system/dashboard`);
         if (res.ok) {
           const data: DashboardMetrics = await res.json();
           setMetrics(data);

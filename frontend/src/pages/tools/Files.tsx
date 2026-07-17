@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Folder, File, Upload, CornerLeftUp, AlertTriangle, RefreshCw } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
-import { fetchApi } from "@/lib/api";
+import { fetchApi, BASE_URL } from "@/lib/api";
 
 interface FileItem {
   name: string;
@@ -78,7 +78,7 @@ export function Files() {
 
     try {
       setLoading(true);
-      await fetch(`http://localhost:8000/api/files/${selectedContainer}/upload`, {
+      await fetch(`${BASE_URL}/api/files/${selectedContainer}/upload`, {
         method: "POST",
         body: formData,
       });
