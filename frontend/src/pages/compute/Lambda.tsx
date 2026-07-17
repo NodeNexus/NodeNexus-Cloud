@@ -58,8 +58,8 @@ export function Lambda() {
                 <CardDescription>Write your code below. It will be executed in an ephemeral container.</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Badge variant={runtime.includes("python") ? "default" : "secondary"} className="cursor-pointer" onClick={() => { setRuntime("python:3.11-alpine"); setCode("print('Hello from Python!')") }}>Python</Badge>
-                <Badge variant={runtime.includes("node") ? "default" : "secondary"} className="cursor-pointer" onClick={() => { setRuntime("node:18-alpine"); setCode("console.log('Hello from Node.js!');") }}>Node.js</Badge>
+                <Badge variant={runtime.includes("python") ? "default" : "outline"} className="cursor-pointer" onClick={() => { setRuntime("python:3.11-alpine"); setCode("print('Hello from Python!')") }}>Python</Badge>
+                <Badge variant={runtime.includes("node") ? "default" : "outline"} className="cursor-pointer" onClick={() => { setRuntime("node:18-alpine"); setCode("console.log('Hello from Node.js!');") }}>Node.js</Badge>
               </div>
             </CardHeader>
             <CardContent>

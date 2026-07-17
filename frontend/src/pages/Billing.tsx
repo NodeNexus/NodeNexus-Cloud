@@ -82,7 +82,7 @@ export function Billing() {
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#121214', borderColor: '#27272a', borderRadius: '8px' }}
                     itemStyle={{ color: '#f8fafc' }}
-                    formatter={(value: number) => [`$${value.toFixed(2)}`, 'Cost']}
+                    formatter={(value) => [`$${(value as number)?.toFixed(2) ?? '0.00'}`, 'Cost']}
                   />
                   <Line type="monotone" dataKey="cost" stroke="#0ea5e9" strokeWidth={2} dot={{ r: 4, fill: "#0ea5e9" }} />
                 </LineChart>
@@ -105,7 +105,7 @@ export function Billing() {
                   <Tooltip 
                     cursor={{ fill: '#27272a' }}
                     contentStyle={{ backgroundColor: '#121214', borderColor: '#27272a', borderRadius: '8px' }}
-                    formatter={(value: number) => [`$${value.toFixed(3)}/hr`, 'Rate']}
+                    formatter={(value) => [`$${(value as number)?.toFixed(3) ?? '0.000'}/hr`, 'Rate']}
                   />
                   <Bar dataKey="cost" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
                 </BarChart>
