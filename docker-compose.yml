@@ -17,7 +17,7 @@ services:
       - "8000:8000"
     environment:
       # P1: CORS - set to your real domain in production
-      - CORS_ORIGINS=http://localhost,http://localhost:80,http://localhost:5173
+      - CORS_ORIGINS=http://localhost,http://localhost:80,http://localhost:5173,http://192.168.1.10
       # P0: Set a strong secret to protect WebSocket terminal/logs endpoints
       # Leave empty for local-only dev mode (no auth). SET THIS IN PRODUCTION.
       - WS_SECRET_TOKEN=
