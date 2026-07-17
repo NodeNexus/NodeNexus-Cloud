@@ -31,7 +31,7 @@ async def add_security_headers(request: Request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "connect-src 'self' ws://localhost:8000 wss://localhost:8000; "
+        "connect-src * 'unsafe-inline'; "
         "script-src 'self' 'unsafe-inline'; "
         "style-src 'self' 'unsafe-inline';"
     )
