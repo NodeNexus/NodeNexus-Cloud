@@ -80,7 +80,7 @@ export function Dashboard() {
                 </>
               ) : (
                 <>
-                  <Badge variant="destructive">Warning</Badge>
+                  <Badge variant="danger">Warning</Badge>
                   <span className="text-text-tertiary ml-2">Systems degraded</span>
                 </>
               )}
