@@ -59,3 +59,10 @@ class SystemService:
             },
             "recent_alerts": []
         }
+        
+    def list_all_containers(self):
+        if not self.client: return []
+        try:
+            return [{"id": c.id[:12], "name": c.name, "image": "".join(c.image.tags)} for c in self.client.containers.list()]
+        except:
+            return []
