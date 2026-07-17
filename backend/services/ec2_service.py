@@ -1,10 +1,10 @@
 import docker
 import asyncio
 import uuid
+from core.security import is_image_allowed
 
 class EC2Service:
     def __init__(self):
-        # We assume the docker socket is mounted to the container
         self.client = docker.from_env()
 
     async def list_instances(self):
@@ -23,9 +23,15 @@ class EC2Service:
         return await asyncio.to_thread(_list)
 
     async def run_instance(self, image: str, instance_type: str = "t2.micro"):
-        # For our RPi, instance_type determines memory/CPU limits
+        # P0: Enforce image allowlist before pulling or running anything
+        if not is_image_allowed(image):
+            raise ValueError(
+                f"Image '{image}' is not in the allowed list. "
+                f"Only official/trusted images may be used."
+            )
+
         mem_limit = "512m" if instance_type == "t2.micro" else "1g"
-        
+
         def _run():
             name = f"i-{uuid.uuid4().hex[:8]}"
             container = self.client.containers.run(
@@ -33,6 +39,9 @@ class EC2Service:
                 detach=True,
                 name=name,
                 mem_limit=mem_limit,
+                # P0: Drop all capabilities and run unprivileged
+                cap_drop=["ALL"],
+                security_opt=["no-new-privileges:true"],
                 labels={"vnav.service": "ec2"}
             )
             return {

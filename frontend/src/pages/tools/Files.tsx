@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Folder, File, Upload, CornerLeftUp } from "lucide-react";
+import { Folder, File, Upload, CornerLeftUp, AlertTriangle, RefreshCw } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
 import { fetchApi } from "@/lib/api";
@@ -22,6 +22,8 @@ export function Files() {
   const [currentPath, setCurrentPath] = useState<string>("/tmp");
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(false);
+  // P3: Track fetch errors (e.g., container stopped between selection and list)
+  const [fileError, setFileError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchApi("/system/containers").then(setContainers).catch(console.error);
@@ -30,11 +32,19 @@ export function Files() {
   const loadFiles = async () => {
     if (!selectedContainer) return;
     setLoading(true);
+    setFileError(null);
     try {
       const data = await fetchApi(`/files/${selectedContainer}/list?path=${encodeURIComponent(currentPath)}`);
       setFiles(data);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      // P3: Distinguish container-stopped errors from generic failures
+      const msg = err?.message || "Unknown error";
+      if (msg.includes("not found") || msg.includes("404")) {
+        setFileError("Container not found or has stopped. Select another container.");
+      } else {
+        setFileError(`Could not list directory: ${msg}`);
+      }
+      setFiles([]);
     } finally {
       setLoading(false);
     }
@@ -127,6 +137,18 @@ export function Files() {
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-text-tertiary py-12">
                   Select a container to view its files.
+                </TableCell>
+              </TableRow>
+            ) : fileError ? (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <div className="flex flex-col items-center gap-3 py-10 text-danger">
+                    <AlertTriangle size={28} />
+                    <p className="text-sm font-semibold">{fileError}</p>
+                    <Button variant="outline" size="sm" onClick={loadFiles}>
+                      <RefreshCw size={12} className="mr-2" /> Retry
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : files.length === 0 ? (
