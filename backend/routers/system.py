@@ -1,10 +1,14 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from services.system_service import system_service
 import asyncio
 import docker
+import concurrent.futures
+from core.security import verify_ws_token, WS_IDLE_TIMEOUT_SECONDS, THREAD_POOL_MAX_WORKERS
 
 router = APIRouter(prefix="/api/system", tags=["System"])
-system_service = SystemService()
+
+# P2: Shared thread pool with explicit max workers
+_executor = concurrent.futures.ThreadPoolExecutor(max_workers=THREAD_POOL_MAX_WORKERS)
 
 @router.get("/dashboard")
 async def get_dashboard():
@@ -22,7 +26,7 @@ async def get_billing():
     client = docker.from_env()
     cost_per_hr = 0
     breakdown = {"Compute": 0, "Database": 0, "Network": 0}
-    
+
     try:
         for c in client.containers.list():
             img = "".join(c.image.tags).lower()
@@ -35,7 +39,7 @@ async def get_billing():
             else:
                 cost_per_hr += 0.02
                 breakdown["Compute"] += 0.02
-    except:
+    except Exception:
         pass
 
     history = []
@@ -43,9 +47,9 @@ async def get_billing():
     for i in range(7, 0, -1):
         history.append({
             "day": f"Day -{i}",
-            "cost": round(base_cost * (0.8 + 0.4 * (i%3)), 2)
+            "cost": round(base_cost * (0.8 + 0.4 * (i % 3)), 2)
         })
-        
+
     return {
         "current_hourly_rate": round(cost_per_hr, 4),
         "projected_monthly": round(cost_per_hr * 730, 2),
@@ -53,21 +57,55 @@ async def get_billing():
         "history": history
     }
 
+
 @router.websocket("/ws/logs/{container_id}")
-async def stream_logs_ws(websocket: WebSocket, container_id: str):
+async def stream_logs_ws(
+    websocket: WebSocket,
+    container_id: str,
+    token: str = Query(default="")
+):
+    # P0: Verify auth token before accepting
+    if not verify_ws_token(token):
+        await websocket.close(code=1008)
+        return
+
     await websocket.accept()
     client = docker.from_env()
     loop = asyncio.get_running_loop()
+
     try:
         container = client.containers.get(container_id)
-        logs = container.logs(stream=True, follow=True, tail=100)
+    except docker.errors.NotFound:
+        await websocket.send_text(f"[ERROR] Container '{container_id}' not found.\n")
+        await websocket.close()
+        return
+
+    logs = container.logs(stream=True, follow=True, tail=100)
+
+    async def _stream():
         while True:
-            line = await loop.run_in_executor(None, next, logs)
-            await websocket.send_text(line.decode('utf-8', errors='replace'))
-    except Exception:
+            try:
+                # P2: Use shared thread pool executor
+                line = await loop.run_in_executor(_executor, next, logs)
+                await websocket.send_text(line.decode('utf-8', errors='replace'))
+            except StopIteration:
+                await websocket.send_text("\n[Container stopped. Log stream ended.]\n")
+                break
+            except Exception:
+                break
+
+    try:
+        # P2: Apply idle timeout to entire stream
+        await asyncio.wait_for(_stream(), timeout=WS_IDLE_TIMEOUT_SECONDS)
+    except asyncio.TimeoutError:
+        try:
+            await websocket.send_text("\n[Log stream timed out due to inactivity.]\n")
+        except Exception:
+            pass
+    except WebSocketDisconnect:
         pass
     finally:
         try:
             await websocket.close()
-        except:
+        except Exception:
             pass
