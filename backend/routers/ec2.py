@@ -7,6 +7,7 @@ router = APIRouter(prefix="/ec2", tags=["EC2"])
 class RunInstanceRequest(BaseModel):
     image: str
     instance_type: str = "t2.micro"
+    name: str | None = None
 
 @router.get("/instances")
 async def list_instances():
@@ -18,7 +19,7 @@ async def list_instances():
 @router.post("/instances")
 async def run_instance(req: RunInstanceRequest):
     try:
-        return await ec2_service.run_instance(req.image, req.instance_type)
+        return await ec2_service.run_instance(req.image, req.instance_type, req.name)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

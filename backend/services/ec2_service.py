@@ -22,7 +22,7 @@ class EC2Service:
             ]
         return await asyncio.to_thread(_list)
 
-    async def run_instance(self, image: str, instance_type: str = "t2.micro"):
+    async def run_instance(self, image: str, instance_type: str = "t2.micro", name: str | None = None):
         # P0: Enforce image allowlist before pulling or running anything
         if not is_image_allowed(image):
             raise ValueError(
@@ -33,11 +33,11 @@ class EC2Service:
         mem_limit = "512m" if instance_type == "t2.micro" else "1g"
 
         def _run():
-            name = f"i-{uuid.uuid4().hex[:8]}"
+            container_name = name if name else f"i-{uuid.uuid4().hex[:8]}"
             container = self.client.containers.run(
                 image,
                 detach=True,
-                name=name,
+                name=container_name,
                 mem_limit=mem_limit,
                 # P0: Drop all capabilities and run unprivileged
                 cap_drop=["ALL"],
@@ -46,7 +46,7 @@ class EC2Service:
             )
             return {
                 "id": container.short_id,
-                "name": name,
+                "name": container_name,
                 "status": "running"
             }
         return await asyncio.to_thread(_run)
