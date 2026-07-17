@@ -1,4 +1,6 @@
-const API_BASE = "http://localhost:8000/api";
+export const API_BASE = `http://${window.location.hostname}:8000/api`;
+export const WS_BASE = `ws://${window.location.hostname}:8000`;
+export const BASE_URL = `http://${window.location.hostname}:8000`;
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const url = `${API_BASE}${endpoint}`;

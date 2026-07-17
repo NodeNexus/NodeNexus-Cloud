@@ -4,7 +4,7 @@ import { FitAddon } from "xterm-addon-fit";
 import "xterm/css/xterm.css";
 import { TerminalSquare, Download, Copy, Maximize, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { fetchApi } from "@/lib/api";
+import { fetchApi, WS_BASE } from "@/lib/api";
 
 interface Container {
   id: string;
@@ -49,7 +49,7 @@ export function Terminal() {
 
     term.writeln(`Connecting to container ${selectedContainer}...`);
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/terminal/${selectedContainer}`);
+    const ws = new WebSocket(`${WS_BASE}/ws/terminal/${selectedContainer}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
