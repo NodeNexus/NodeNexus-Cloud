@@ -66,3 +66,6 @@ class SystemService:
             return [{"id": c.id[:12], "name": c.name, "image": "".join(c.image.tags)} for c in self.client.containers.list()]
         except:
             return []
+
+# Module-level singleton — imported by routers/system.py
+system_service = SystemService()
